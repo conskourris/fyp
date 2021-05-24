@@ -1,0 +1,230 @@
+import os
+import datetime as dt 
+import matplotlib.pyplot as plt 
+from matplotlib import style
+import matplotlib
+import numpy as np
+from math import floor
+from scipy.stats import skew
+import mplfinance as mpf
+import pandas as pd
+import pandas_datareader as web
+import random
+import pickle
+import json
+import statistics
+
+
+def run_snp(pattern, trading, days_forward):
+    result = {}
+    with open(f'sp100tickers.pickle', 'rb') as f:
+        tickers = pickle.load(f)
+
+    for ticker in tickers:
+        try:
+            df = pd.read_csv(f'historical/{ticker}.csv')
+        except:
+            print(f'problem oppening {ticker}')
+            continue
+
+        indexes, pattern_length = pattern(df)
+        returns = trading(df, indexes, pattern_length, days_forward)
+        result[f'{ticker}'] = returns
+
+    return result
+
+
+def run_ticker(ticker, pattern, strategy, days_forward):
+	result = {}
+	with open(f'sp100tickers.pickle', 'rb') as f:
+		tickers = pickle.load(f)
+
+	df = pd.read_csv(f'historical/{ticker}.csv')
+
+	indexes, pattern_length = pattern(df)
+	returns = strategy(df, indexes, pattern_length, days_forward)
+	result[f'{ticker}'] = returns
+
+	return result
+
+
+def save_pattern_indexes(pattern) :
+    with open(f'sp100tickers.pickle', 'rb') as f:
+        tickers = pickle.load(f)
+
+    for ticker in tickers :
+        try :
+            df = pd.read_csv(f'historical/{ticker}.csv')
+        except :
+            print(f'problem oppening {ticker}')
+            continue
+
+        indexes, _ = pattern(df)
+        pattern_str = pattern.__name__
+        np.save(f'patterns_indexes/{pattern_str}/{ticker}.npy', indexes)
+
+        print(f'Saved {ticker} of {pattern_str}')
+
+
+def save_pattern_final_indexes(pattern) :
+    with open(f'sp100tickers.pickle', 'rb') as f:
+        tickers = pickle.load(f)
+
+    for ticker in tickers :
+        try :
+            df = pd.read_csv(f'historical/{ticker}.csv')
+        except :
+            print(f'problem oppening {ticker}')
+            continue
+
+        indexes, _ = pattern(df)
+        pattern_str = pattern.__name__
+        np.save(f'patterns_final_indexes/{pattern_str}/{ticker}.npy', indexes)
+
+        print(f'Saved {ticker} of {pattern_str}')
+
+
+def run_strategy_on_pattern(strategy, pattern, days_forward=0) :
+    result = {}
+    
+    with open(f'sp100tickers.pickle', 'rb') as f:
+        tickers = pickle.load(f)
+
+    for ticker in tickers :
+        try :
+            df = pd.read_csv(f'historical/{ticker}.csv')
+        except :
+            print(f'problem oppening {ticker}')
+            continue
+
+        _, pattern_length = pattern(None, get_length=True)
+        pattern_str = pattern.__name__
+        indexes = np.load(f'patterns_indexes/{pattern_str}/{ticker}.npy')
+        returns = strategy(df, indexes, pattern_length, days_forward)
+        result[f'{ticker}'] = returns
+
+    return result
+
+
+def get_pattern_indexes(pattern) :
+    indexes = {}
+    pattern_str = pattern.__name__
+
+    with open(f'sp100tickers.pickle', 'rb') as f:
+        tickers = pickle.load(f)
+
+    for ticker in tickers :
+        try :
+            indexes[ticker] = np.load(f'patterns_indexes/{pattern_str}/{ticker}.npy')
+        except FileNotFoundError:
+            continue
+
+    return indexes
+
+
+def get_pattern_final_indexes(pattern) :
+    indexes = {}
+    pattern_str = pattern.__name__
+
+    with open(f'sp100tickers.pickle', 'rb') as f:
+        tickers = pickle.load(f)
+
+    for ticker in tickers :
+        try :
+            indexes[ticker] = np.load(f'patterns_final_indexes/{pattern_str}/{ticker}.npy')
+        except FileNotFoundError:
+            continue
+
+    return indexes
+
+
+def get_pattern_occurances(pattern) :
+    indexes = get_pattern_indexes(pattern)
+    occs = 0
+    for i in indexes :
+        occs += len(indexes[i])
+    
+    return occs
+
+
+def get_pattern_final_occurances(pattern) :
+    indexes = get_pattern_final_indexes(pattern)
+    occs = 0
+    for i in indexes :
+        occs += len(indexes[i])
+    
+    return occs
+
+
+def filter_pattern_trend(indexes, trend, delay=0) :
+    with open(f'sp100tickers.pickle', 'rb') as f:
+        tickers = pickle.load(f)
+
+    for ticker in tickers :
+        try :
+            df = pd.read_csv(f'historical/{ticker}.csv')
+        except :
+            print(f'problem oppening {ticker}')
+            continue
+
+        new_indexes = []
+
+        for i in indexes[ticker] :
+            if trend(df, i+delay) is True :
+                new_indexes.append(i)
+
+        indexes[ticker] = new_indexes
+
+    return indexes
+
+
+def average_close_high() :
+    with open(f'sp100tickers.pickle', 'rb') as f:
+        tickers = pickle.load(f)
+
+    ratios = []
+
+    for ticker in tickers :
+        try :
+            df = pd.read_csv(f'historical/{ticker}.csv')
+        except :
+            print(f'problem oppening {ticker}')
+            continue
+
+        for i in range(df.shape[0]) :
+            close = df['Close'].iloc[i]
+            high = df['High'].iloc[i]
+
+            ratio = (abs(high-close) / close)
+            ratios.append(ratio)
+
+
+    average = statistics.mean(ratios)
+
+    return average
+
+
+def average_close_low() :
+    with open(f'sp100tickers.pickle', 'rb') as f:
+        tickers = pickle.load(f)
+
+    ratios = []
+
+    for ticker in tickers :
+        try :
+            df = pd.read_csv(f'historical/{ticker}.csv')
+        except :
+            print(f'problem oppening {ticker}')
+            continue
+
+        for i in range(df.shape[0]) :
+            close = df['Close'].iloc[i]
+            low = df['Low'].iloc[i]
+
+            ratio = (abs(low-close) / close)
+            ratios.append(ratio)
+
+
+    average = statistics.mean(ratios)
+
+    return average
