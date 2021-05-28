@@ -203,7 +203,5 @@ negative_trends = [
                    negative_fit_7,
                    negative_fit_8,
                    negative_fit_9,
-                   negative_fit_10,
-                   negative_fit_11,
-                   negative_fit_12                  
+                   negative_fit_10              
 ]

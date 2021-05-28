@@ -203,7 +203,5 @@ positive_trends = [
                    positive_fit_7,
                    positive_fit_8,
                    positive_fit_9,
-                   positive_fit_10,
-                   positive_fit_11,
-                   positive_fit_12                  
+                   positive_fit_10              
 ]

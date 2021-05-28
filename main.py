@@ -18,6 +18,7 @@ from patterns_final import *
 from tools import *
 from evaluation_tools import *
 from plotting_tools import *
+from trading_tools import *
 
 from definitions.positive_fit import *
 from definitions.positive_mav3 import *
@@ -33,14 +34,10 @@ from definitions.close_near_high import *
 from definitions.close_near_low import *
 
 
+for pattern in all_patterns_final :
 
-# generate and plot a pattern profile using specific definitions
-# rets, stds, occs = method_on_pattern(positive_trends, three_line_strike_bullish, True, 1)
-# np.savez('definition_results/three_line_strike_bullish.npz', rets, stds, occs)
+	_, result_lst = get_pattern_trading_results(pattern, exit_after_0)
 
-# # # plot saved return - risk plots of pattern profiles
-plot_result_data('three_line_strike_bullish', positive_trends, use_occ=False, best_fit=False, f=1)
-plot_result_data('three_line_strike_bullish', positive_trends, use_occ=True, best_fit=False, f=2)
-
+	plot_hist(result_lst)
 
 plt.show()

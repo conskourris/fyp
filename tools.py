@@ -228,3 +228,15 @@ def average_close_low() :
     average = statistics.mean(ratios)
 
     return average
+
+
+# def test_definitions(pattern, definitions, file_name) :
+#     # generate and plot a pattern profile using specific definitions
+#     rets, stds, occs = method_on_pattern(definitions, pattern, False, 0)
+#     np.savez(f'definition_results/{file_name}.npz', rets, stds, occs)
+
+#     # # plot saved return - risk plots of pattern profiles
+#     plot_result_data(file_name, definitions, use_occ=False, best_fit=False, f=1)
+#     plot_result_data(file_name, definitions, use_occ=True, best_fit=False, f=2)
+
+
