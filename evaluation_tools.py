@@ -14,12 +14,15 @@ import pickle
 import json
 
 from trading_strategies import *
-from patterns import *
+from patterns_final import *
 from tools import *
 from definitions.negative_fit import *
 from definitions.negative_mav3 import *
 from definitions.negative_mav4 import *
 from definitions.negative_mav5 import *
+
+font = {'size'   : 14}
+matplotlib.rc('font', **font)
 
 
 def plot_hist(title, data, size):
@@ -114,7 +117,7 @@ def meta_evaluate(pattern, indexes) :
     with open(f'sp100tickers.pickle', 'rb') as f:
         tickers = pickle.load(f)
 
-    _, pattern_length = pattern(None, get_length=True)
+    _, pattern_length, _ = pattern(None, get_info=True)
     pattern_str = pattern.__name__
 
     opens = []

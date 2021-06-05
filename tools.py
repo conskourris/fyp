@@ -14,6 +14,8 @@ import pickle
 import json
 import statistics
 
+from patterns_final import *
+
 
 def run_snp(pattern, trading, days_forward):
     result = {}
@@ -27,7 +29,7 @@ def run_snp(pattern, trading, days_forward):
             print(f'problem oppening {ticker}')
             continue
 
-        indexes, pattern_length = pattern(df)
+        indexes, pattern_length, _ = pattern(df)
         returns = trading(df, indexes, pattern_length, days_forward)
         result[f'{ticker}'] = returns
 
@@ -41,7 +43,7 @@ def run_ticker(ticker, pattern, strategy, days_forward):
 
 	df = pd.read_csv(f'historical/{ticker}.csv')
 
-	indexes, pattern_length = pattern(df)
+	indexes, pattern_length, _ = pattern(df)
 	returns = strategy(df, indexes, pattern_length, days_forward)
 	result[f'{ticker}'] = returns
 
@@ -59,7 +61,7 @@ def save_pattern_indexes(pattern) :
             print(f'problem oppening {ticker}')
             continue
 
-        indexes, _ = pattern(df)
+        indexes, _, _ = pattern(df)
         pattern_str = pattern.__name__
         np.save(f'patterns_indexes/{pattern_str}/{ticker}.npy', indexes)
 
@@ -77,8 +79,11 @@ def save_pattern_final_indexes(pattern) :
             print(f'problem oppening {ticker}')
             continue
 
-        indexes, _ = pattern(df)
+        indexes, _, _ = pattern(df)
         pattern_str = pattern.__name__
+        if os.path.exists(f'patterns_final_indexes/{pattern_str}') is False :
+            os.mkdir(f'patterns_final_indexes/{pattern_str}')
+            
         np.save(f'patterns_final_indexes/{pattern_str}/{ticker}.npy', indexes)
 
         print(f'Saved {ticker} of {pattern_str}')
@@ -97,7 +102,7 @@ def run_strategy_on_pattern(strategy, pattern, days_forward=0) :
             print(f'problem oppening {ticker}')
             continue
 
-        _, pattern_length = pattern(None, get_length=True)
+        _, pattern_length, _ = pattern(None, get_length=True)
         pattern_str = pattern.__name__
         indexes = np.load(f'patterns_indexes/{pattern_str}/{ticker}.npy')
         returns = strategy(df, indexes, pattern_length, days_forward)
@@ -138,7 +143,7 @@ def get_pattern_final_indexes(pattern) :
     return indexes
 
 
-def get_pattern_occurances(pattern) :
+def get_pattern_occurrences(pattern) :
     indexes = get_pattern_indexes(pattern)
     occs = 0
     for i in indexes :
@@ -147,7 +152,7 @@ def get_pattern_occurances(pattern) :
     return occs
 
 
-def get_pattern_final_occurances(pattern) :
+def get_pattern_final_occurrences(pattern) :
     indexes = get_pattern_final_indexes(pattern)
     occs = 0
     for i in indexes :

@@ -34,10 +34,36 @@ from definitions.close_near_high import *
 from definitions.close_near_low import *
 
 
+names = []
+occs = []
+
+
+# for pattern in all_patterns_final :
+# 	names.append(pattern.__name__)
+# 	occs.append(get_pattern_final_occurrences(pattern))
+
+# sort = [(a, x) for a, x in sorted(zip(occs, names))]
+
+# for i in sort :
+# 	print(i)
+
+
+
+# save_pattern_final_indexes(engulfing_bearish)
+
+
+# occs = get_pattern_final_indexes(three_outside_up)
+
+# for ticker in occs :
+# 	for i in occs[ticker] :
+# 		plot_around_index(ticker, i, 10)
+
+# 		plt.show()
+
+
+
 for pattern in all_patterns_final :
-
-	_, result_lst = get_pattern_trading_results(pattern, exit_after_0)
-
-	plot_hist(result_lst)
+	indexes = get_pattern_indexes(pattern)
+	meta_evaluate(pattern, indexes)
 
 plt.show()

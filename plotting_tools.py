@@ -10,6 +10,10 @@ import pickle
 
 def plot_around_index(ticker, i, day_range):
 
-	df = pd.read_csv('historical/{}.csv'.format(ticker), parse_dates=True, index_col=0)
+	try :
+		df = pd.read_csv('historical/{}.csv'.format(ticker), parse_dates=True, index_col=0)
 
-	mpf.plot(df[i-day_range : i+day_range], type='candle', ylabel_lower='', figsize=(10,6))
+		mpf.plot(df[i-day_range : i+day_range], type='candle', ylabel_lower='', figsize=(10,6))
+
+	except IndexError :
+		pass

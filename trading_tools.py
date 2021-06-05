@@ -24,7 +24,7 @@ def save_pattern_trading_results(pattern, strategy) :
 
 	rets_dict, rets_list = strategy(pattern)
 
-	if os.path.exists(f'trading_results/{strategy}') is False :
+	if os.path.exists(f'trading_results/{strategy.__name__}') is False :
 		os.mkdir(f'trading_results/{strategy.__name__}')
 
 	np.savez(f'trading_results/{strategy.__name__}/{pattern.__name__}.npz', rets_dict, rets_list)
@@ -33,12 +33,106 @@ def save_pattern_trading_results(pattern, strategy) :
 
 def get_pattern_trading_results(pattern, strategy) :
 
-	results = np.load(f'trading_results/{strategy.__name__}/{pattern.__name__}.npz')
+	results = np.load(f'trading_results/{strategy.__name__}/{pattern.__name__}.npz', allow_pickle=True)
 	print(f'got {strategy.__name__} for {pattern.__name__}')
+	dict_results = results['arr_0']
+	list_results = results['arr_1']
 
-	return results['arr_0'], results['arr_1']
+	return dict_results, list_results
 
 
 def plot_hist_trading_results(pattern, strategy) :
 
-	pass
+	_, data = get_pattern_trading_results(pattern, strategy)
+
+	if len(data) == 0 :
+		return None, None
+
+	rng = max(data) - min(data)
+	mean = sum(data)/len(data)
+	std = np.std(data)
+	occurances = len(data)
+
+	plt.figure(figsize=(10,6))
+	plt.title(f'Distribution of return of {strategy.__name__} on {pattern.__name__}')
+	plt.hist(data, bins=int(rng/0.005))
+	plt.vlines(mean, 0, occurances/10)
+	plt.xlabel('Return')
+	plt.ylabel('Occurances')
+
+	print('Mean: ', mean)
+	print('S.D: ', std)
+	print('Skewness: ', skew(data))
+	print('Occurances: ', occurances)
+
+	return mean, std
+
+
+def plot_patterns_on_strategy(patterns, strategy) :
+
+	returns = []
+	stds = []
+	labels = []
+
+	plt.figure(figsize=(10, 6))
+	plt.title(f'Return against volatility for patterns on {strategy.__name__}')
+
+	counter = 0
+	for pattern in patterns :
+		counter += 1
+		_, data = get_pattern_trading_results(pattern, strategy)
+
+		ret = sum(data)/len(data)
+		std = np.std(data)
+
+		returns.append(ret)
+		stds.append(std)
+
+		if counter <= 10 :
+			plt.plot(std, ret, 'o', label=pattern.__name__)
+
+		else :
+			plt.plot(std, ret, 'x', label=pattern.__name__)
+		print(f'Occurances: {len(data)}')
+
+	plt.xlabel('Volatility')
+	plt.ylabel('Return')
+	plt.legend(loc='best')
+
+	return returns, stds
+
+
+def plot_strategies_on_pattern(strategies, pattern) :
+
+	returns = []
+	stds = []
+	labels = []
+
+	plt.figure(figsize=(10, 6))
+	plt.title(f'Return against volatility for strategies on {pattern.__name__}')
+
+	counter = 0
+	for strategy in strategies :
+		counter += 1
+
+		_, data = get_pattern_trading_results(pattern, strategy)
+
+		ret = sum(data)/len(data)
+		std = np.std(data)
+
+		returns.append(ret)
+		stds.append(std)
+
+		if counter <= 10 :
+			plt.plot(std, ret, 'o', label=strategy.__name__)
+
+		else :
+			plt.plot(std, ret, 'x', label=strategy.__name__)
+
+		print(f'Occurances: {len(data)}')
+
+	plt.xlabel('Volatility')
+	plt.ylabel('Return')
+	plt.legend(loc='best')
+
+	return returns, stds
