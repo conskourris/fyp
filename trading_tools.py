@@ -19,6 +19,9 @@ from evaluation_tools import *
 from plotting_tools import *
 from trading_strategies import *
 
+font = {'size'   : 14}
+matplotlib.rc('font', **font)
+
 
 def save_pattern_trading_results(pattern, strategy) :
 
@@ -68,7 +71,7 @@ def plot_hist_trading_results(pattern, strategy) :
 	return mean, std
 
 
-def plot_patterns_on_strategy(patterns, strategy) :
+def plot_patterns_on_strategy(patterns, strategy, occ=False) :
 
 	returns = []
 	stds = []
@@ -82,7 +85,10 @@ def plot_patterns_on_strategy(patterns, strategy) :
 		counter += 1
 		_, data = get_pattern_trading_results(pattern, strategy)
 
-		ret = sum(data)/len(data)
+		if occ is True :
+			ret = sum(data)
+		else :
+			ret = sum(data)/len(data)
 		std = np.std(data)
 
 		returns.append(ret)
@@ -102,7 +108,7 @@ def plot_patterns_on_strategy(patterns, strategy) :
 	return returns, stds
 
 
-def plot_strategies_on_pattern(strategies, pattern) :
+def plot_strategies_on_pattern(strategies, pattern, occ=False) :
 
 	returns = []
 	stds = []
@@ -117,7 +123,10 @@ def plot_strategies_on_pattern(strategies, pattern) :
 
 		_, data = get_pattern_trading_results(pattern, strategy)
 
-		ret = sum(data)/len(data)
+		if occ is True :
+			ret = sum(data)
+		else :
+			ret = sum(data)/len(data)
 		std = np.std(data)
 
 		returns.append(ret)
