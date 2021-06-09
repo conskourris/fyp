@@ -71,6 +71,20 @@ def plot_hist_trading_results(pattern, strategy) :
 	return mean, std
 
 
+def get_distribution_metrics(pattern, strategy, occ=False) :
+
+	_, data = get_pattern_trading_results(pattern, strategy)
+
+	if occ is True :
+		ret = sum(data)
+	else :
+		ret = sum(data) / len(data)
+
+	std = np.std(data)
+
+	return ret, std
+
+
 def plot_patterns_on_strategy(patterns, strategy, occ=False) :
 
 	returns = []
@@ -145,3 +159,88 @@ def plot_strategies_on_pattern(strategies, pattern, occ=False) :
 	plt.legend(loc='best')
 
 	return returns, stds
+
+
+def plot_patterns_on_strategies(patterns, strategies, bullish, occ=False) :
+
+	returns = []
+	stds = []
+	labels = []
+
+	plt.figure(figsize=(10, 6))
+	plt.title(f'Return against volatility for patterns on their optimal strategy')
+
+	counter = 0
+	for i, pattern in enumerate(patterns) :
+		_, _, nature = pattern(get_info=True)
+
+		if nature == bullish :
+			counter += 1
+			_, data = get_pattern_trading_results(pattern, strategies[i])
+
+			if occ is True :
+				ret = sum(data)
+			else :
+				ret = sum(data)/len(data)
+			std = np.std(data)
+
+			returns.append(ret)
+			stds.append(std)
+
+			if counter <= 10 :
+				plt.plot(std, ret, 'o', label=pattern.__name__)
+
+			else :
+				plt.plot(std, ret, 'x', label=pattern.__name__)
+			print(f'Occurances: {len(data)}')
+
+		else :
+			pass
+
+	plt.xlabel('Volatility')
+	plt.ylabel('Return')
+	plt.legend(loc='best')
+
+	return returns, stds
+
+
+def get_most_profitable_strategies(strategies, pattern, occ=False) :
+	amount = 10
+	returns = []
+	stds = []
+	labels = []
+
+	for strategy in strategies :
+
+		_, data = get_pattern_trading_results(pattern, strategy)
+
+		if occ is True :
+			ret = sum(data)
+		else :
+			ret = sum(data)/len(data)
+		std = np.std(data)
+
+		returns.append(ret)
+		stds.append(std)
+		labels.append(strategy.__name__)
+
+	max_returns = []
+	max_stds = []
+	max_labels = []
+
+	for i in range(amount) :
+		index = returns.index(max(returns))
+
+		max_returns.append(returns.pop(index))
+		max_stds.append(stds.pop(index))
+		max_labels.append(labels.pop(index))
+
+	plt.figure(figsize=(10, 6))
+	plt.title(f'Return against volatility for most profitable strategies on {pattern.__name__}')
+	for i in range(len(max_returns)) :
+		plt.plot(max_stds[i], max_returns[i], 'o', label=max_labels[i])
+	plt.xlabel('Standard Deviation')
+	plt.ylabel('Log Return')
+	plt.legend(loc='best')
+
+	return max_returns, max_stds

@@ -623,14 +623,14 @@ all_patterns_final = [
     morning_star,
     rising_window,
     three_black_crows,
+    two_black_gapping,
     three_line_strike_bearish,
     three_line_strike_bullish,
     three_outside_down,
     three_outside_up,
-    two_black_gapping,
     upside_tasuki_gap,
-    random_bullish,
-    random_bearish
+    random_bearish,
+    random_bullish
     ]
 
 bullish_patterns = [
