@@ -9,6 +9,7 @@ from scipy.stats import skew
 import mplfinance as mpf
 import pandas as pd
 import pandas_datareader as web
+from pandas_datareader import data
 import random
 import pickle
 import json
@@ -25,7 +26,7 @@ font = {'size'   : 14}
 matplotlib.rc('font', **font)
 
 
-def plot_hist(title, data, size):
+def plot_hist(title, data, size=0.005):
     range = max(data) - min(data)
     plt.figure(figsize=(10,6), dpi=80)
     plt.title(title)
@@ -207,4 +208,11 @@ def meta_evaluate(pattern, indexes) :
     ax1.legend(loc='best')
 
     return opens, high, low, close, high_std, low_std, occurances
+
+
+
+
+
+
+
 

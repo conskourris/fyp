@@ -8,7 +8,7 @@ from math import floor
 from scipy.stats import skew
 import mplfinance as mpf
 import pandas as pd
-import pandas_datareader as web
+from pandas_datareader import data
 import random
 import pickle
 import json

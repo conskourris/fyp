@@ -8,13 +8,32 @@ from math import floor
 from scipy.stats import skew
 import mplfinance as mpf
 import pandas as pd
-import pandas_datareader as web
+from pandas_datareader import data
 import random
 import pickle
 import json
 import statistics
 
 from patterns_final import *
+
+
+def save_historical_data() :
+
+    start = dt.datetime(2000, 1, 1)
+    end = dt.datetime(2020, 12, 31)
+
+    with open(f'sp100tickers.pickle', 'rb') as f:
+        tickers = pickle.load(f)
+
+    for ticker in tickers :
+
+        try :
+            df = data.DataReader(ticker, 'yahoo', start, end)
+        except KeyError :
+            pass
+
+        df.to_csv(f'historical/{ticker}.csv')
+        print(f'saved {ticker}')
 
 
 def run_snp(pattern, trading, days_forward):

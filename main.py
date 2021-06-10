@@ -8,13 +8,14 @@ from math import floor
 from scipy.stats import skew
 import mplfinance as mpf
 import pandas as pd
-import pandas_datareader as web
+from pandas_datareader import data
 import random
 import pickle
 import json
 
 from patterns_final import *
 from tools import *
+from evaluate_findings import *
 from evaluation_tools import *
 from plotting_tools import *
 from trading_tools import *
@@ -43,6 +44,8 @@ from trading_strategies.limit_exit6 import *
 from trading_strategies.limit_exit7 import *
 from trading_strategies.limit_exit8 import *
 from trading_strategies.limit_exit9 import *
+
+import trading_strategies.best_strategies as bs
 
 all_limit_exit = [
 	all_limit_exit0,
@@ -82,23 +85,40 @@ best_strategies = [
 	limit1250_exit7
 ]
 
-# all_strategies = []
-# for strategies in all_limit_exit :
-# 	all_strategies += strategies
 
-# for pattern in all_patterns_final :
-# 	get_most_profitable_strategies(all_strategies, pattern)
+original = np.load(f'evaluation_results/original_data_distributions_bear_occ.npz', allow_pickle=True)
+rets = original['arr_0']
+stds = original['arr_1']
 
-r, s = plot_patterns_on_strategies(all_patterns_final[:-2], best_strategies[:-2], True, True)
+evaluation = np.load(f'evaluation_results/evaluation_data_distributions_bear_occ.npz', allow_pickle=True)
+rets_eval = evaluation['arr_0']
+stds_eval = evaluation['arr_1']
 
-print(zip(r, s))
+plt.figure(figsize=(10, 6))
+plt.title(f'Return against volatility for bearish original and evaluation data')
 
-# for strategy in all_limit1250_exit :
-# 	for pattern in all_patterns_final :
-# 		save_pattern_trading_results(pattern, strategy)
+for i in range(len(rets[:-1])) :
+	plt.plot(stds[i], rets[i], 'o', label=bullish_patterns[i].__name__)
 
-# for strategies in all_limit_exit :
-# 	plot_strategies_on_pattern(strategies, abandoned_baby_bullish)
+for i in range(len(rets_eval[:-1])) :
+	plt.plot(stds_eval[i], rets_eval[i], 'x')
+
+plt.xlabel('Standard Deviation')
+plt.ylabel('Log Return')
+plt.legend(loc='best')
+
+
+
+
+
+
+
+# results = [(a, b, c.__name__) for (a, b, c) in sorted(zip(rets, stds, all_patterns_final)) ]
+
+# print(" \n ### All all patterns sorted by returns (no occ) ### \n ")
+
+# for result in results :
+# 	print(result)
 
 
 
