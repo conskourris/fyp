@@ -85,30 +85,52 @@ best_strategies = [
 	limit1250_exit7
 ]
 
+best_bullish_strategies = [
+	limit750_exit6,
+	limit1250_exit9,
+	limit1000_exit9,
+	limit1250_exit9,
+	limit1250_exit8,
+	limit1250_exit8,
+	limit1000_exit8,
+	limit0_exit6,
+	limit500_exit8,
+	limit500_exit7,
+	limit1250_exit7
+]
 
-original = np.load(f'evaluation_results/original_data_distributions_bear_occ.npz', allow_pickle=True)
+best_bearish_strategies = [
+	limit400_exit0,
+	limit100_exit0,
+	limit50_exit6,
+	limit100_exit0,
+	limit750_exit1,
+	limit750_exit1,
+	limit50_exit0,
+	limit1250_exit2,
+	limit0_exit1,
+	limit50_exit0,
+	limit400_exit0
+]
+
+
+original = np.load(f'evaluation_results/original_data_distributions_bull.npz', allow_pickle=True)
 rets = original['arr_0']
 stds = original['arr_1']
 
-evaluation = np.load(f'evaluation_results/evaluation_data_distributions_bear_occ.npz', allow_pickle=True)
+evaluation = np.load(f'evaluation_results/evaluation400_data_distributions_bull.npz', allow_pickle=True)
 rets_eval = evaluation['arr_0']
 stds_eval = evaluation['arr_1']
 
-plt.figure(figsize=(10, 6))
-plt.title(f'Return against volatility for bearish original and evaluation data')
+zscores = []
+for i in range(len(rets)) :
+	z = np.abs(rets[i] - rets_eval[i]) / np.sqrt(stds[i]**2 + stds_eval[i]**2)
+	zscores.append(z)
 
-for i in range(len(rets[:-1])) :
-	plt.plot(stds[i], rets[i], 'o', label=bullish_patterns[i].__name__)
+results = [(a, b.__name__) for a, b in sorted(zip(zscores, bullish_patterns))]
 
-for i in range(len(rets_eval[:-1])) :
-	plt.plot(stds_eval[i], rets_eval[i], 'x')
-
-plt.xlabel('Standard Deviation')
-plt.ylabel('Log Return')
-plt.legend(loc='best')
-
-
-
+for r in results :
+	print(r)
 
 
 

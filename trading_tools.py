@@ -81,8 +81,25 @@ def get_distribution_metrics(pattern, strategy, occ=False) :
 		ret = sum(data) / len(data)
 
 	std = np.std(data)
+	occs = len(data)
 
-	return ret, std
+	return ret, std, occs
+
+
+def get_simple_distribution_metrics(pattern, strategy, occ=False) :
+
+	_, data = get_pattern_trading_results(pattern, strategy)
+
+	simp_rets = np.exp(data)
+
+	if occ is True :
+		simp_ret = np.prod(simp_rets)
+	else :
+		simp_ret = np.mean(simp_rets)
+
+	std = np.std(simp_rets)
+
+	return simp_ret, std
 
 
 def plot_patterns_on_strategy(patterns, strategy, occ=False) :

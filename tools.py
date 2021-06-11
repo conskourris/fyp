@@ -1,4 +1,5 @@
 import os
+import bs4 as bs
 import datetime as dt 
 import matplotlib.pyplot as plt 
 from matplotlib import style
@@ -13,8 +14,27 @@ import random
 import pickle
 import json
 import statistics
+import requests
+
 
 from patterns_final import *
+
+
+def save_sp500_tickers():
+
+    resp = requests.get('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
+    soup = bs.BeautifulSoup(resp.text, "lxml")
+    table = soup.find('table', {'class':'wikitable sortable'})
+    tickers = []
+
+    for row in table.findAll('tr')[1:]:
+        ticker = row.findAll('td')[0].text.strip()
+        tickers.append(ticker)
+    # saves list as a byte stream through pickle
+    with open("sp500tickers.pickle", "wb") as f:
+        pickle.dump(tickers, f)
+
+    return tickers
 
 
 def save_historical_data() :

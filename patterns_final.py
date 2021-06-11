@@ -655,9 +655,9 @@ bearish_patterns = [
     evening_star,
     last_engulfing_top,
     three_black_crows,
+    two_black_gapping,
     three_line_strike_bearish,
     three_outside_down,
-    two_black_gapping,
     random_bearish
 ]
 
