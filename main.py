@@ -33,6 +33,8 @@ from definitions.doji import *
 from definitions.close_near_high import *
 from definitions.close_near_low import *
 
+from trading_strategies.best_strategies import *
+
 from trading_strategies.exit_after import *
 from trading_strategies.limit_exit0 import *
 from trading_strategies.limit_exit1 import *
@@ -114,24 +116,22 @@ best_bearish_strategies = [
 ]
 
 
-original = np.load(f'evaluation_results/original_data_distributions_bull.npz', allow_pickle=True)
-rets = original['arr_0']
-stds = original['arr_1']
+plot_hist_trading_results(last_engulfing_bottom, exit_after_7)
 
-evaluation = np.load(f'evaluation_results/evaluation400_data_distributions_bull.npz', allow_pickle=True)
-rets_eval = evaluation['arr_0']
-stds_eval = evaluation['arr_1']
 
-zscores = []
-for i in range(len(rets)) :
-	z = np.abs(rets[i] - rets_eval[i]) / np.sqrt(stds[i]**2 + stds_eval[i]**2)
-	zscores.append(z)
 
-results = [(a, b.__name__) for a, b in sorted(zip(zscores, bullish_patterns))]
+# pattern = last_engulfing_bottom
+# strategy = limit1250_exit9
+# index_strategy = index_limit1250_exit9
 
-for r in results :
-	print(r)
+# util_indexes = index_limit1250_exit9(pattern)
 
+# returns_dict, returns = get_pattern_trading_results(pattern, strategy)
+# returns_dict = returns_dict[()]
+
+# for ticker in util_indexes :
+# 	if len(returns_dict[ticker]) != len(util_indexes[ticker]) :
+# 		print(f'Difference in {ticker}')
 
 
 

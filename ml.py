@@ -48,70 +48,80 @@ from trading_strategies.limit_exit9 import *
 from trading_strategies.best_strategies import *
 
 from keras.models import Sequential
-from keras.layers import Dense, LSTM
+from keras.layers import Dense, LSTM, Dropout
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
+from keras import models
+
+font = {'size'   : 14}
+matplotlib.rc('font', **font)
+
+best_strategies = [
+	limit750_exit6,
+	limit1250_exit9,
+	limit400_exit0,
+	limit1000_exit9,
+	limit100_exit0,
+	limit50_exit6,
+	limit100_exit0,
+	limit750_exit1,
+	limit1250_exit9,
+	limit750_exit1,
+	limit1250_exit8,
+	limit1250_exit8,
+	limit1000_exit8,
+	limit50_exit0,
+	limit1250_exit2,
+	limit0_exit1,
+	limit0_exit6,
+	limit50_exit0,
+	limit500_exit8,
+	limit500_exit7,
+	limit400_exit0,
+	limit1250_exit7
+]
 
 
-pattern = last_engulfing_bottom
-strategy = limit1250_exit9
-index_strategy = index_limit1250_exit9
-days_prior = 10
+model = models.load_model(f'ml_models/two_black_gapping_20days_prior')
 
-_, length, _ = pattern(get_info=True)
-dimention = (length + days_prior)
-
-# save_train_test_dicts(pattern, strategy, index_strategy, days_prior)
-
-X_train_dict, X_test_dict, y_train_dict, y_test_dict = get_train_test_dicts(pattern, strategy, days_prior)
-
-X_train = flatten_dict(X_train_dict)
-X_train = np.array(X_train)
-
-X_test = flatten_dict(X_test_dict)
-X_test = np.array(X_test)
+model.summary()
 
 
-y_train_raw = flatten_dict(y_train_dict)
-y_train = [(1 if x >= 0 else 0) for x in y_train_raw]
-y_train = np.array(y_train)
-
-y_test_raw = flatten_dict(y_test_dict)
-y_test = [(1 if x >= 0 else 0) for x in y_test_raw]
-y_test = np.array(y_test)
-
-scaler = preprocessing.StandardScaler()
-# scaler = preprocessing.MinMaxScaler(feature_range = (0, 1))
-X_train_norm = scaler.fit_transform(X_train)
-X_test_norm = scaler.fit_transform(X_test)
-# X_train_norm = X_train
-# X_test_norm = X_test
-
-X_train_norm = np.reshape(X_train_norm, (X_train_norm.shape[0], int(X_train_norm.shape[1]/5), 5))
-X_test_norm = np.reshape(X_test_norm, (X_test_norm.shape[0], int(X_test_norm.shape[1]/5), 5))
+# considered_days = [0, 5, 10, 20]
 
 
-model = Sequential()
-# model.add(Dense(25, activation="relu", input_dim=dimention))
-# model.add(Dense(5, activation="relu"))
-model.add(LSTM(32, return_sequences=True, input_shape=(dimention, 5)))
-model.add(LSTM(64, return_sequences=True))
-model.add(LSTM(128))
-model.add(Dense(1, activation="sigmoid"))
+# for days_prior in considered_days :
+# 	p_rets, p_stds, ml_rets, ml_stds = [], [], [], []
 
-model.compile(loss = "binary_crossentropy",  optimizer = "adam", metrics = ['accuracy'])
-# model.compile(loss = "mean_squared_error",  optimizer = "adam", metrics = ['mse'])
-model.fit(X_train_norm, y_train, epochs=10, batch_size=64)
+# 	for pattern, strategy, index_strategy in zip(all_patterns_final[:-2], best_strategies[:-2], index_strategies[:-2]) :
+		
+# 		_, _, bullish = pattern(get_info=True)
 
+# 		if bullish is False :
+# 			results = np.load(f'ml_models/evaluation/{pattern.__name__}_{days_prior}days_dist.npz', allow_pickle=True)
+			
+# 			pattern_return = results['arr_0'][()]
+# 			pattern_std = results['arr_1'][()]
+# 			ml_return = results['arr_2'][()]
+# 			ml_std = results['arr_3'][()]
 
-_, accuracy = model.evaluate(X_test_norm, y_test)
-preds = model.predict_classes(X_test_norm)
-print(preds)
-print('Accuracy: %.2f' % (accuracy*100))
+# 			p_rets.append(pattern_return)
+# 			p_stds.append(pattern_std)
+# 			ml_rets.append(ml_return)
+# 			ml_stds.append(ml_std)
 
-print(np.sum(y_test)/len(y_test))
+# 	plt.figure(figsize=(10, 6))
+# 	plt.title(f'Return against volatility for bearish original and ML data ({days_prior} days)')
 
+# 	for i in range(len(p_rets)) :
+# 		plt.plot(p_stds[i], p_rets[i], 'o', label=bearish_patterns[i].__name__)
 
+# 	for i in range(len(p_rets)) :
+# 		plt.plot(ml_stds[i], ml_rets[i], 'x')
+
+# 	plt.xlabel('Standard Deviation')
+# 	plt.ylabel('Log Return')
+# 	plt.legend(loc='best')
 
 
 plt.show()

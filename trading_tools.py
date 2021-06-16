@@ -57,11 +57,11 @@ def plot_hist_trading_results(pattern, strategy) :
 	occurances = len(data)
 
 	plt.figure(figsize=(10,6))
-	plt.title(f'Distribution of return of {strategy.__name__} on {pattern.__name__}')
+	plt.title(f'Distribution of return for {strategy.__name__} on {pattern.__name__}')
 	plt.hist(data, bins=int(rng/0.005))
-	plt.vlines(mean, 0, occurances/10)
+	plt.vlines(mean, 0, occurances/20)
 	plt.xlabel('Return')
-	plt.ylabel('Occurances')
+	plt.ylabel('Frequency')
 
 	print('Mean: ', mean)
 	print('S.D: ', std)

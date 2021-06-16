@@ -661,3 +661,4 @@ bearish_patterns = [
     random_bearish
 ]
 
+
